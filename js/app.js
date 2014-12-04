@@ -27,7 +27,10 @@ Enemy.prototype.render = function() {
 // This class requires an update(), render() and
 // a handleInput() method.
 var Player = function(x,y,xStep,yStep) {
+	
 	this.sprite = 'images/char-boy.png';// Might allow user to select this at start
+	Resources.load([this.sprite]);//Add the player image to the global resources, so that we have access to height/width attributes.
+	
 	
 	//define start position and number of pixels to move when user hits movement key
 	this.x = x;
@@ -41,11 +44,13 @@ Player.prototype.update = function(x,y) {
 }
 Player.prototype.render = function() {
 	ctx.drawImage(Resources.get(this.sprite),this.x, this.y);
+	
 }
 
 Player.prototype.handleInput = function(kc) {
 	console.log("key pressed: " + kc);
 	console.log("x before: " + this.x + " - y before: " + this.y);
+	
 	// The way I've written this, the player sprite moves on the image?
 	// 		A: sort of - the "main()" function in engine.js redraws the entire frame, using
 	//			the x/y values we've set here. 
@@ -54,13 +59,13 @@ Player.prototype.handleInput = function(kc) {
 			if (this.y > this.yStep) this.y -= this.yStep;//y = 0 is top
 			break;
 		case (kc === 'down'):
-			this.y += this.yStep;
+			if (this.y + this.yStep + Resources.get(this.sprite).height < ctx.canvas.height) this.y += this.yStep;
 			break;
 		case (kc === 'left'):
 			if (this.x >= this.xStep) this.x -= this.xStep;
 			break;
 		case (kc === 'right'):
-			this.x += this.xStep;
+			if (this.x + this.xStep + Resources.get(this.sprite).width < ctx.canvas.width) this.x += this.xStep;
 			break;
 	}
 	console.log("x after: " + this.x + " - y after: " + this.y);
