@@ -8,8 +8,10 @@ var Enemy = function(x,y) {
     this.sprite = 'images/enemy-bug.png';
     this.x = x;
     //this.w = Resources.get(this.sprite).width;
-    this.y = y;
+    
     //this.h = Resources.get(this.sprite).height;
+    this.eh = 70;//need to crop the image so that collisions work properly;
+    this.y = y;
 }
 
 // Update the enemy's position, required method for game
@@ -22,7 +24,17 @@ Enemy.prototype.update = function(dt) {
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+	//var eh = Resources.get(this.sprite).height;
+	//var eh = 70;
+	var ew = Resources.get(this.sprite).width;
+	ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+	//console.log("ctx.drawImage(" + Resources.get(this.sprite) + ",0,40," + ew + ",50," + this.x + "," + this.y + "," + ew + ",50);");
+	//ctx.drawImage(Resources.get(this.sprite),0,75,ew,this.eh,this.x,this.y,ew,this.eh);
+	
+    
+    ctx.rect(this.x,this.y,Resources.get(this.sprite).width,Resources.get(this.sprite).height);
+    ctx.strokeStyle = "red";
+    ctx.stroke()
 }
 
 // Now write your own player class
@@ -44,35 +56,33 @@ var Player = function(x,y,xStep,yStep) {
 // http://stackoverflow.com/questions/20846944/check-if-two-items-overlap-on-a-canvas-using-javascript
 Player.prototype.intersects = function(enemy) {// 
 	var pw = Resources.get(this.sprite).width;// Surely we can set these up in the player/enemy constructors?
-	var ph = Resource.get(this.sprite).height;
+	var ph = Resources.get(this.sprite).height;
 	var ew = Resources.get(enemy.sprite).width;
-	var eh = Resource.get(enemy.sprite).height;
+	var eh = Resources.get(enemy.sprite).height;
 	
     	return !( enemy.x > (this.x + pw) || 
-             (enemy.x + ew) <  this.x           || 
-              enemy.y > (this.y + ph) ||
-             (enemy.y + eh) <  this.y);
+                (enemy.x + ew) <  this.x || 
+                 enemy.y > (this.y + ph) ||
+                (enemy.y + eh) <  this.y );
 }
 
 Player.prototype.update = function(x,y) {
-	//Check to see where new player x,y values are. If they touch an Enemy, they're DOOOOOO000MMEDDD!!ONE1
-	if (allEnemies) {
-		for (thisEnemy in allEnemies) {
-			Console.log("Touching enemy " + thisEnemy + "? " + this.intersects(allEnemies[thisEnemy]));
-		}
-	}
+	
 }
 
 Player.prototype.render = function() {
 	ctx.drawImage(Resources.get(this.sprite),this.x, this.y);
+	 ctx.rect(this.x,this.y,Resources.get(this.sprite).width,Resources.get(this.sprite).height);
+	    ctx.strokeStyle = "blue";
+	    ctx.stroke()
 }
 
 Player.prototype.handleInput = function(kc) {
 	// The way I've written this, the player sprite moves on the image?
 	// 		A: sort of - the "main()" function in engine.js redraws the entire frame, using
 	//			the x/y values we've set here. 
-	var ph = Resource.get(this.sprite).height;
-	var pw = Resource.get(this.sprite).width;
+	var ph = Resources.get(this.sprite).height;
+	var pw = Resources.get(this.sprite).width;
 	switch (true) {
 		case (kc === 'up'):
 			if (this.y > this.yStep) this.y -= this.yStep;//y = 0 is top
@@ -87,7 +97,12 @@ Player.prototype.handleInput = function(kc) {
 			if (this.x + pw + this.xStep < ctx.canvas.width) this.x += this.xStep;
 			break;
 	}
-	this.update(this.x,this.y);
+	/*
+	console.clear();
+	for (thisEnemy in allEnemies) {
+		console.log("Touching enemy " + thisEnemy + "? " + this.intersects(allEnemies[thisEnemy]) + "(Player: " + this.x + "," + this.y + " - Enemy: " + allEnemies[thisEnemy]);
+	}
+	*/
 }
 
 // Now instantiate your objects.
@@ -96,7 +111,7 @@ Player.prototype.handleInput = function(kc) {
 var allEnemies = [];
 for (var i = 0;i < 4;i++) {// Ideally, we'd set the number of enemies in resources.js, possibly based on user input
 	var x = 0;
-	var y = 100 * i;
+	var y = (120 * i) + 55;
 	allEnemies.push(new Enemy(x,y));
 }
 
