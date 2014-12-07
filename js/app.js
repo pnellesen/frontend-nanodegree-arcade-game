@@ -6,8 +6,12 @@ var Enemy = function(x,y) {
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
+    //Resources.load([this.sprite]);// Not needed since enemy-bug.png already loaded in resources.jpg
+
     this.x = x;
+    //this.w = Resources.get(this.sprite).width;
     this.y = y;
+    //this.h = Resources.get(this.sprite).height;
 }
 
 // Update the enemy's position, required method for game
@@ -29,9 +33,8 @@ Enemy.prototype.render = function() {
 var Player = function(x,y,xStep,yStep) {
 	
 	this.sprite = 'images/char-boy.png';// Might allow user to select this at start
-	Resources.load([this.sprite]);//Add the player image to the global resources, so that we have access to height/width attributes.
-	
-	
+	//this.sprite = 'images/char-horn-girl.png';// Might allow user to select this at start
+	//Resources.load(this.sprite);//not needed for char-boy.png. Uncomment if using a different image
 	//define start position and number of pixels to move when user hits movement key
 	this.x = x;
 	this.y = y;
@@ -39,40 +42,54 @@ var Player = function(x,y,xStep,yStep) {
 	this.yStep = yStep;
 }
 
-Player.prototype.update = function(x,y) {
-	//player sprite is a
+// The following 'intersects' method adapted from an example found at
+// http://stackoverflow.com/questions/20846944/check-if-two-items-overlap-on-a-canvas-using-javascript
+Player.prototype.intersects = function(enemy) {// 
+	var pw = Resources.get(this.sprite).width;// Surely we can set these up in the player/enemy constructors?
+	var ph = Resource.get(this.sprite).height;
+	var ew = Resources.get(enemy.sprite).width;
+	var eh = Resource.get(enemy.sprite).height;
+	
+    	return !( enemy.x > (this.x + pw) || 
+             (enemy.x + ew) <  this.x           || 
+              enemy.y > (this.y + ph) ||
+             (enemy.y + eh) <  this.y);
 }
+
+Player.prototype.update = function(x,y) {
+	//Check to see where new player x,y values are. If they touch an Enemy, they're DOOOOOO000MMEDDD!!ONE1
+	if (allEnemies) {
+		for (thisEnemy in allEnemies) {
+			Console.log("Touching enemy " + thisEnemy + "? " + this.intersects(allEnemies[thisEnemy]));
+		}
+	}
+}
+
 Player.prototype.render = function() {
 	ctx.drawImage(Resources.get(this.sprite),this.x, this.y);
-	
 }
 
 Player.prototype.handleInput = function(kc) {
-	console.log("key pressed: " + kc);
-	console.log("x before: " + this.x + " - y before: " + this.y);
-	
 	// The way I've written this, the player sprite moves on the image?
 	// 		A: sort of - the "main()" function in engine.js redraws the entire frame, using
 	//			the x/y values we've set here. 
+	var ph = Resource.get(this.sprite).height;
+	var pw = Resource.get(this.sprite).width;
 	switch (true) {
 		case (kc === 'up'):
 			if (this.y > this.yStep) this.y -= this.yStep;//y = 0 is top
 			break;
 		case (kc === 'down'):
-			if (this.y + this.yStep + Resources.get(this.sprite).height < ctx.canvas.height) this.y += this.yStep;
+			if (this.y + ph + this.yStep < ctx.canvas.height) this.y += this.yStep;
 			break;
 		case (kc === 'left'):
 			if (this.x >= this.xStep) this.x -= this.xStep;
 			break;
 		case (kc === 'right'):
-			if (this.x + this.xStep + Resources.get(this.sprite).width < ctx.canvas.width) this.x += this.xStep;
+			if (this.x + pw + this.xStep < ctx.canvas.width) this.x += this.xStep;
 			break;
 	}
-	console.log("x after: " + this.x + " - y after: " + this.y);
-	/*
-	 * this.update(kc);
-	 * this.render();
-	 */
+	this.update(this.x,this.y);
 }
 
 // Now instantiate your objects.
