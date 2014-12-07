@@ -6,8 +6,6 @@ var Enemy = function(x,y) {
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
-    //Resources.load([this.sprite]);// Not needed since enemy-bug.png already loaded in resources.jpg
-
     this.x = x;
     //this.w = Resources.get(this.sprite).width;
     this.y = y;
@@ -33,8 +31,8 @@ Enemy.prototype.render = function() {
 var Player = function(x,y,xStep,yStep) {
 	
 	this.sprite = 'images/char-boy.png';// Might allow user to select this at start
-	//this.sprite = 'images/char-horn-girl.png';// Might allow user to select this at start
-	//Resources.load(this.sprite);//not needed for char-boy.png. Uncomment if using a different image
+	Resources.load([this.sprite]);//Add the player image to the global resources, so that we have access to height/width attributes.
+	
 	//define start position and number of pixels to move when user hits movement key
 	this.x = x;
 	this.y = y;
