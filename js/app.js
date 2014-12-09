@@ -7,10 +7,6 @@ var Enemy = function(x,y) {
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
     this.x = x;
-    //this.w = Resources.get(this.sprite).width;
-    
-    //this.h = Resources.get(this.sprite).height;
-    this.eh = 70;//need to crop the image so that collisions work properly;
     this.y = y;
 }
 
@@ -24,17 +20,7 @@ Enemy.prototype.update = function(dt) {
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
-	//var eh = Resources.get(this.sprite).height;
-	//var eh = 70;
-	var ew = Resources.get(this.sprite).width;
 	ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-	//console.log("ctx.drawImage(" + Resources.get(this.sprite) + ",0,40," + ew + ",50," + this.x + "," + this.y + "," + ew + ",50);");
-	//ctx.drawImage(Resources.get(this.sprite),0,75,ew,this.eh,this.x,this.y,ew,this.eh);
-	
-    
-    ctx.rect(this.x,this.y,Resources.get(this.sprite).width,Resources.get(this.sprite).height);
-    ctx.strokeStyle = "red";
-    ctx.stroke()
 }
 
 // Now write your own player class
@@ -43,8 +29,7 @@ Enemy.prototype.render = function() {
 var Player = function(x,y,xStep,yStep) {
 	
 	this.sprite = 'images/char-boy.png';// Might allow user to select this at start
-	Resources.load([this.sprite]);//Add the player image to the global resources, so that we have access to height/width attributes.
-	
+	Resources.load(this.sprite);
 	//define start position and number of pixels to move when user hits movement key
 	this.x = x;
 	this.y = y;
@@ -52,18 +37,22 @@ var Player = function(x,y,xStep,yStep) {
 	this.yStep = yStep;
 }
 
-// The following 'intersects' method adapted from an example found at
-// http://stackoverflow.com/questions/20846944/check-if-two-items-overlap-on-a-canvas-using-javascript
-Player.prototype.intersects = function(enemy) {// 
-	var pw = Resources.get(this.sprite).width;// Surely we can set these up in the player/enemy constructors?
-	var ph = Resources.get(this.sprite).height;
-	var ew = Resources.get(enemy.sprite).width;
-	var eh = Resources.get(enemy.sprite).height;
+
+Player.prototype.intersects = function(enemy) {
+	  
+	return !( enemy.x != this.x || enemy.y != this.y);
 	
-    	return !( enemy.x > (this.x + pw) || 
-                (enemy.x + ew) <  this.x || 
-                 enemy.y > (this.y + ph) ||
-                (enemy.y + eh) <  this.y );
+	/*
+	Use the following if we decide to allow for smoother left/right movement.
+	This method adapted from an example found at
+	http://stackoverflow.com/questions/20846944/check-if-two-items-overlap-on-a-canvas-using-javascript
+	
+	var pw = Resources.get(this.sprite).width;
+	var ew = Resources.get(enemy.sprite).width;
+	return !( enemy.x > (this.x + pw - 20) || 
+            (enemy.x + ew) <  (this.x + 20) || 
+             enemy.y != this.y);
+	*/
 }
 
 Player.prototype.update = function(x,y) {
@@ -72,9 +61,6 @@ Player.prototype.update = function(x,y) {
 
 Player.prototype.render = function() {
 	ctx.drawImage(Resources.get(this.sprite),this.x, this.y);
-	 ctx.rect(this.x,this.y,Resources.get(this.sprite).width,Resources.get(this.sprite).height);
-	    ctx.strokeStyle = "blue";
-	    ctx.stroke()
 }
 
 Player.prototype.handleInput = function(kc) {
@@ -83,26 +69,28 @@ Player.prototype.handleInput = function(kc) {
 	//			the x/y values we've set here. 
 	var ph = Resources.get(this.sprite).height;
 	var pw = Resources.get(this.sprite).width;
+	console.clear();
 	switch (true) {
 		case (kc === 'up'):
-			if (this.y > this.yStep) this.y -= this.yStep;//y = 0 is top
+			if (this.y - this.yStep > 0) this.y -= this.yStep;//y = 0 is top
 			break;
 		case (kc === 'down'):
-			if (this.y + ph + this.yStep < ctx.canvas.height) this.y += this.yStep;
+			if (this.y + ph + this.yStep <= ctx.canvas.height) this.y += this.yStep;
 			break;
 		case (kc === 'left'):
-			if (this.x >= this.xStep) this.x -= this.xStep;
+			console.log("Left result for: " + this.x + " - " + this.xStep);
+			if (this.x - this.xStep >= 0) this.x -= this.xStep;
 			break;
 		case (kc === 'right'):
-			if (this.x + pw + this.xStep < ctx.canvas.width) this.x += this.xStep;
+			if (this.x + pw + this.xStep <= ctx.canvas.width) this.x += this.xStep;
 			break;
 	}
-	/*
-	console.clear();
+	
+	
 	for (thisEnemy in allEnemies) {
 		console.log("Touching enemy " + thisEnemy + "? " + this.intersects(allEnemies[thisEnemy]) + "(Player: " + this.x + "," + this.y + " - Enemy: " + allEnemies[thisEnemy]);
 	}
-	*/
+	
 }
 
 // Now instantiate your objects.
@@ -111,11 +99,10 @@ Player.prototype.handleInput = function(kc) {
 var allEnemies = [];
 for (var i = 0;i < 4;i++) {// Ideally, we'd set the number of enemies in resources.js, possibly based on user input
 	var x = 0;
-	var y = (120 * i) + 55;
+	var y = (83 * i) + 50;// Magic numbers. Bleh. Need to find a way to make the 50 and 83 values "globally accessible".
 	allEnemies.push(new Enemy(x,y));
 }
-
-var player = new Player(100,55,50,50);
+var player = new Player(101,50,101,83);// I hate magic numbers - 101 is width of all blocks, 83 is defined in engine.js as the default y step size when adding the blocks.
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
