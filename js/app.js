@@ -17,10 +17,15 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
+	
 	if ( this.x <= ctx.canvas.width) {// let the Enemy appear to smoothly move past right side
 		this.x += this.velocity*dt;
 	} else {
 		this.x = -(Resources.get(this.sprite).width);// Start enemy entirely beyond left side, then have it appear to move smoothly into canvas
+	}
+	if (checkCollision(player,this)) {
+		player.x = player.xInit;
+		player.y = player.yInit;
 	}
 }
 
@@ -39,30 +44,16 @@ var Player = function(x,y,xStep,yStep) {
 	//define start position and number of pixels to move when user hits movement key
 	this.x = x;
 	this.y = y;
+	this.xInit = x;
+	this.yInit = y;
 	this.xStep = xStep;
 	this.yStep = yStep;
 }
 
 
-Player.prototype.intersects = function(enemy) {
-	  
-	return !( enemy.x != this.x || enemy.y != this.y);
-	
-	/*
-	Use the following if we decide to allow for smoother left/right movement.
-	This method adapted from an example found at
-	http://stackoverflow.com/questions/20846944/check-if-two-items-overlap-on-a-canvas-using-javascript
-	
-	var pw = Resources.get(this.sprite).width;
-	var ew = Resources.get(enemy.sprite).width;
-	return !( enemy.x > (this.x + pw - 20) || 
-            (enemy.x + ew) <  (this.x + 20) || 
-             enemy.y != this.y);
-	*/
-}
-
 Player.prototype.update = function(x,y) {
-	
+	// Call this to reset player's position if it intersects enemy
+
 }
 
 Player.prototype.render = function() {
@@ -91,7 +82,12 @@ Player.prototype.handleInput = function(kc) {
 			break;
 	}
 	for (thisEnemy in allEnemies) {
-		console.log("Touching enemy " + thisEnemy + "? " + this.intersects(allEnemies[thisEnemy]) + "(Player: " + this.x + "," + this.y + " - Enemy: " + allEnemies[thisEnemy]);
+		console.log("Touching enemy " + thisEnemy + "? " + checkCollision(this,allEnemies[thisEnemy]) + "(Player: " + this.x + "," + this.y + " - Enemy: " + allEnemies[thisEnemy]);
+		if (checkCollision(this,allEnemies[thisEnemy])) {
+			this.x = this.xInit;
+			this.y = this.yInit;
+		}
+		
 	}
 	
 }
@@ -120,4 +116,16 @@ document.addEventListener('keyup', function(e) {
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
+/*
+The following function adapted from an example found at
+http://stackoverflow.com/questions/20846944/check-if-two-items-overlap-on-a-canvas-using-javascript
+Note: we're subtracting 20px from left and right side of player to account for some transparency in player image
+*/
+function checkCollision(pl,en) {
+	var pw = Resources.get(pl.sprite).width;
+	var ew = Resources.get(en.sprite).width;
+	return !( en.x > (pl.x + pw - 20) || 
+            (en.x + ew) <  (pl.x + 20) || 
+             en.y != pl.y);
+}
 //dummy comment here
