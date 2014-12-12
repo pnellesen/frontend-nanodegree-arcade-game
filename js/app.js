@@ -8,6 +8,7 @@ var Enemy = function(x,y) {
     this.sprite = 'images/enemy-bug.png';
     this.x = x;
     this.y = y;
+    this.velocity = Math.floor(Math.random()*(121)+100);// this found at http://stackoverflow.com/questions/4959975/generate-random-value-between-two-numbers-in-javascript
 }
 
 // Update the enemy's position, required method for game
@@ -16,6 +17,11 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
+	if ( this.x <= ctx.canvas.width) {// let the Enemy appear to smoothly move past right side
+		this.x += this.velocity*dt;
+	} else {
+		this.x = -(Resources.get(this.sprite).width);// Start enemy entirely beyond left side, then have it appear to move smoothly into canvas
+	}
 }
 
 // Draw the enemy on the screen, required method for game
@@ -78,15 +84,12 @@ Player.prototype.handleInput = function(kc) {
 			if (this.y + ph + this.yStep <= ctx.canvas.height) this.y += this.yStep;
 			break;
 		case (kc === 'left'):
-			console.log("Left result for: " + this.x + " - " + this.xStep);
 			if (this.x - this.xStep >= 0) this.x -= this.xStep;
 			break;
 		case (kc === 'right'):
 			if (this.x + pw + this.xStep <= ctx.canvas.width) this.x += this.xStep;
 			break;
 	}
-	
-	
 	for (thisEnemy in allEnemies) {
 		console.log("Touching enemy " + thisEnemy + "? " + this.intersects(allEnemies[thisEnemy]) + "(Player: " + this.x + "," + this.y + " - Enemy: " + allEnemies[thisEnemy]);
 	}
@@ -102,7 +105,8 @@ for (var i = 0;i < 4;i++) {// Ideally, we'd set the number of enemies in resourc
 	var y = (83 * i) + 50;// Magic numbers. Bleh. Need to find a way to make the 50 and 83 values "globally accessible".
 	allEnemies.push(new Enemy(x,y));
 }
-var player = new Player(101,50,101,83);// I hate magic numbers - 101 is width of all blocks, 83 is defined in engine.js as the default y step size when adding the blocks.
+
+var player = new Player(0,382,101,83);// I hate magic numbers - 101 is width of all blocks, 83 is defined in engine.js as the default y step size when adding the blocks.
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
