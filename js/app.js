@@ -7,6 +7,8 @@
 var CanvasItem = function(x,y,sprite) {
 	this.x = x || 0;
 	this.y = y || 0;
+	this.xInit = this.x;
+	this.yInit = this.y;
 	this.sprite = sprite || "";
 	this.width = Resources.get(this.sprite).width || 0;
 	this.height = Resources.get(this.sprite).height || 0;
@@ -37,7 +39,11 @@ Enemy.prototype.update = function(dt) {
 		player.reset();
 	}
 }
-
+Enemy.prototype.reset = function() {
+	this.x = this.xInit;
+	this.y = this.yInit;
+	this.velocity = Math.floor(Math.random()*(121)+100);
+}
 // Draw the enemy on the screen, required method for game
 /* Moved render function into CanvasItem constructor
  * 
@@ -53,8 +59,8 @@ var Player = function(x,y,xStep,yStep) {
 	this.base = CanvasItem;
 	this.base(x,y,'images/char-boy.png');
 
-	this.xInit = x;//starting x and y values. Will be used to reset player if it collides with enemy
-	this.yInit = y;
+	//this.xInit = x;//starting x and y values. Will be used to reset player if it collides with enemy
+	//this.yInit = y;
 	
 	this.xStep = xStep;//Number of pixels to move per keystroke in both x and y directions. Might not be needed.
 	this.yStep = yStep;
@@ -74,7 +80,7 @@ Player.prototype.reset = function(checkTime) {//send player back to start, updat
 	if (!checkTime) {
 		this.x = this.xInit;
 		this.y = this.yInit;
-		console.log("Hit by enemy! Start over");
+		console.log("Starting over");
 	} else {
 		if (this.bestTime === null || this.totalTime < this.bestTime) this.bestTime = this.totalTime;
 		console.log("You win! Total time: " + formatTimeString(this.totalTime) + " - Best Time: " + formatTimeString(this.bestTime));	
@@ -147,6 +153,15 @@ document.addEventListener('keyup', function(e) {
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
+// Listen for clicks on "New Game" button, call "reset" in engine.js
+window.onload = function () {
+	document.getElementById("newGame").addEventListener("click", function(e) {
+		console.log("New Game clicked");
+		reset();// game reset in engine.js
+	},false);	
+}
+
 /*
 The following function adapted from an example found at
 http://stackoverflow.com/questions/20846944/check-if-two-items-overlap-on-a-canvas-using-javascript
@@ -168,4 +183,5 @@ function formatTimeString(thisTime) {
 	
 	return (thisMins + ":" + thisSecs);
 }
+
 //dummy comment here

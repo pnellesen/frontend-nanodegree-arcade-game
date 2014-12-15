@@ -69,7 +69,7 @@ var Engine = (function(global) {
      */
     function init() {
     	buildAll();
-        reset();
+        //reset();
         lastTime = Date.now();
         main();
     }
@@ -166,6 +166,14 @@ var Engine = (function(global) {
      */
     function reset() {
         // noop
+    	console.log("engine reset enabled");
+    	
+    	global.animate = true;
+    	allEnemies.forEach(function(enemy) {
+    		enemy.reset();
+    	});
+    	player.reset();
+    	main();
     }
 
     /* Go ahead and load all of the images we know we're going to need to
@@ -187,4 +195,5 @@ var Engine = (function(global) {
      */
     global.ctx = ctx;
     global.animate = animate;
+    global.reset = reset;
 })(this);
