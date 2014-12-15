@@ -64,7 +64,7 @@ var Engine = (function(global) {
      * game loop.
      */
     function init() {
-    	console.log("Resources at init: " + JSON.stringify(Resources));
+    	buildAll();
         reset();
         lastTime = Date.now();
         main();
