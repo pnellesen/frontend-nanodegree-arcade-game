@@ -58,15 +58,39 @@ var Player = function(x,y,xStep,yStep) {
 	
 	this.xStep = xStep;//Number of pixels to move per keystroke in both x and y directions. Might not be needed.
 	this.yStep = yStep;
+	
+	// Set up timers to track total time per round and best time.
+	this.startTime = new Date();
+	this.timer = this.startTime;
+	this.totalTime = null;
+	this.bestTime = null;// this might be a global variable if more than one player
+	console.log("Player start time: " + this.timer);
 }
 
-Player.prototype.reset = function() {
-	this.x = this.xInit;
-	this.y = this.yInit;
+Player.prototype.reset = function(checkTime) {//send player back to start, update best time if player has reached top, reset player timer
+	this.totalTime = this.timer - this.startTime;// time in milliseconds.
+	this.startTime = new Date();
+	this.timer = this.startTime;
+	if (!checkTime) {
+		this.x = this.xInit;
+		this.y = this.yInit;
+		console.log("Hit by enemy! Start over");
+	} else {
+		if (this.bestTime === null || this.totalTime < this.bestTime) this.bestTime = this.totalTime;
+		console.log("You win! Total time: " + formatTimeString(this.totalTime) + " - Best Time: " + formatTimeString(this.bestTime));	
+	}
+
 }
 Player.prototype.update = function(x,y) {
-	// this is called every time main is called in engine.js
-
+	/* this is called every time main is called in engine.js.
+	 * simply update the timer to the new system time.
+	 * When game ends, start time will be subtracted from this.timer value
+	 */
+	if (this.y - this.yStep <= 0) {// Player wins!
+		animate=false;// Global variable set in engine.js to control animation
+		this.reset(true);
+	}
+	this.timer = new Date();
 }
 /*
  * Moved render function into CanvasItem constructor
@@ -92,14 +116,6 @@ Player.prototype.handleInput = function(kc) {
 			if (this.x + this.width + this.xStep <= ctx.canvas.width) this.x += this.xStep;
 			break;
 	}
-	for (thisEnemy in allEnemies) {
-		//console.log("Touching enemy " + thisEnemy + "? " + checkCollision(this,allEnemies[thisEnemy]) + "(Player: " + this.x + "," + this.y + " - Enemy: " + allEnemies[thisEnemy]);
-		if (checkCollision(this,allEnemies[thisEnemy])) {
-			this.reset();
-			break;
-		}
-		
-	}
 	
 }
 
@@ -108,6 +124,7 @@ Player.prototype.handleInput = function(kc) {
 // Place the player object in a variable called player
 var allEnemies = [];
 var player;
+
 function buildAll() {
 	console.log("got to buildAll");
 	for (var i = 0;i < 4;i++) {// Ideally, we'd set the number of enemies in resources.js, possibly based on user input
@@ -139,5 +156,16 @@ function checkCollision(pl,en) {
 	return !( en.x > (pl.x + pl.width - 20) || 
             (en.x + en.width) <  (pl.x + 20) || 
              en.y != pl.y);
+}
+
+function formatTimeString(thisTime) {
+	// see http://stackoverflow.com/questions/5588465/javascript-parse-time-minutesseconds-from-miliseconds
+	var thisMins = Math.round((thisTime/1000/60) << 0);
+	var thisSecs = Math.round((thisTime/1000) % 60);
+	
+	if (thisMins < 10) thisMins = "0" + thisMins.toString(); 
+	if (thisSecs < 10) thisSecs = "0" + thisSecs.toString();
+	
+	return (thisMins + ":" + thisSecs);
 }
 //dummy comment here
