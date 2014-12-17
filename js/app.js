@@ -132,9 +132,9 @@ var GameClock = function(x,y) {
 	this.startTime = new Date();
 }
 GameClock.prototype.drawClock = function (ms) {// ms is number of milliseconds. Clock will display in 00:00 format
-	ctx.font = "30px Arial";
+	ctx.font = this.y + "px Arial";
 	ctx.fillStyle = "#ffffff";
-	ctx.fillRect(this.x, 0, 200,40);
+	ctx.fillRect(this.x, 0, 80,this.y + 10);
 	ctx.fillStyle = "#000000";
 	ctx.fillText(formatTimeString(ms),this.x,this.y);
 }
