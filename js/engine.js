@@ -23,7 +23,7 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
-        animate = true,
+        animate = false,
         lastTime;
 
     canvas.width = 505;
@@ -96,6 +96,7 @@ var Engine = (function(global) {
      * render methods.
      */
     function updateEntities(dt) {
+    	pClock.drawClock(new Date() - pClock.startTime);
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
@@ -173,6 +174,8 @@ var Engine = (function(global) {
     		enemy.reset();
     	});
     	player.reset();
+    	pClock.reset();
+
     	main();
     }
 

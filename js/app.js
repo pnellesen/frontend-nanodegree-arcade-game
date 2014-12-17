@@ -1,4 +1,4 @@
-/* create a new object to use as base for
+/* Create a new object to use as base for
  * all objects which we'll be putting on our
  * canvas. Every object has, at minimum,
  * a position, an image, and a render function which
@@ -10,8 +10,13 @@ var CanvasItem = function(x,y,sprite) {
 	this.xInit = this.x;
 	this.yInit = this.y;
 	this.sprite = sprite || "";
-	this.width = Resources.get(this.sprite).width || 0;
-	this.height = Resources.get(this.sprite).height || 0;
+	this.width = 0;
+	this.height = 0;
+	if (this.sprite) {
+		this.width = Resources.get(this.sprite).width;
+		this.height = Resources.get(this.sprite).height;
+	}
+	
 	this.render = function() {
 		ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 	};
@@ -58,18 +63,14 @@ Enemy.prototype.render = function() {
 var Player = function(x,y,xStep,yStep) {
 	this.base = CanvasItem;
 	this.base(x,y,'images/char-boy.png');
-
-	//this.xInit = x;//starting x and y values. Will be used to reset player if it collides with enemy
-	//this.yInit = y;
 	
-	this.xStep = xStep;//Number of pixels to move per keystroke in both x and y directions. Might not be needed.
-	this.yStep = yStep;
+	this.xStep = xStep || 0;//Number of pixels to move per keystroke in both x and y directions. Might not be needed.
+	this.yStep = yStep || 0;
 	
 	// Set up timers to track total time per round and best time.
 	this.startTime = new Date();
 	this.timer = this.startTime;
 	this.totalTime = null;
-	this.bestTime = null;// this might be a global variable if more than one player
 	console.log("Player start time: " + this.timer);
 }
 
@@ -80,12 +81,14 @@ Player.prototype.reset = function(checkTime) {//send player back to start, updat
 	if (!checkTime) {
 		this.x = this.xInit;
 		this.y = this.yInit;
+		pClock.reset();
 		console.log("Starting over");
 	} else {
-		if (this.bestTime === null || this.totalTime < this.bestTime) this.bestTime = this.totalTime;
-		console.log("You win! Total time: " + formatTimeString(this.totalTime) + " - Best Time: " + formatTimeString(this.bestTime));	
+		if (bestTime === 0 || this.totalTime < bestTime) bestTime = this.totalTime;
+		bstClock.drawClock(bestTime);
+		console.log("You win! Total time: " + formatTimeString(this.totalTime) + " - Best Time: " + formatTimeString(bestTime));	
 	}
-
+	
 }
 Player.prototype.update = function(x,y) {
 	/* this is called every time main is called in engine.js.
@@ -98,12 +101,6 @@ Player.prototype.update = function(x,y) {
 	}
 	this.timer = new Date();
 }
-/*
- * Moved render function into CanvasItem constructor
-Player.prototype.render = function() {
-	ctx.drawImage(Resources.get(this.sprite),this.x, this.y);
-}
-*/
 Player.prototype.handleInput = function(kc) {
 	// The way I've written this, the player sprite moves on the image?
 	// 		A: sort of - the "main()" function in engine.js redraws the entire frame, using
@@ -125,12 +122,34 @@ Player.prototype.handleInput = function(kc) {
 	
 }
 
+/* -------------------------------------------
+ * a "GameClock" is a CanvasItem that can be implemented
+ * to display a timer at any given x/y coordinate. * 
+ -------------------------------------------- */
+var GameClock = function(x,y) {
+	this.base = CanvasItem;
+	this.base(x,y);
+	this.startTime = new Date();
+}
+GameClock.prototype.drawClock = function (ms) {// ms is number of milliseconds. Clock will display in 00:00 format
+	ctx.font = "30px Arial";
+	ctx.fillStyle = "#ffffff";
+	ctx.fillRect(this.x, 0, 200,40);
+	ctx.fillStyle = "#000000";
+	ctx.fillText(formatTimeString(ms),this.x,this.y);
+}
+GameClock.prototype.reset = function () {
+	this.startTime = new Date();
+}
+// End GameClock
+
+
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 var allEnemies = [];
 var player;
-
+var bestTime = 0;// this is time in milliseconds
 function buildAll() {
 	console.log("got to buildAll");
 	for (var i = 0;i < 4;i++) {// Ideally, we'd set the number of enemies in resources.js, possibly based on user input
@@ -139,6 +158,12 @@ function buildAll() {
 		allEnemies.push(new Enemy(x,y));
 	}
 	player = new Player(0,382,101,83);// I hate magic numbers - 101 is width of all blocks, 83 is defined in engine.js as the default y step size when adding the blocks.
+	
+	pClock = new GameClock(120,30);// Clock to display current player time
+	bstClock = new GameClock(340,30);// Clock to display best time
+	
+	pClock.drawClock(0);
+	bstClock.drawClock(0);
 	
 }
 // This listens for key presses and sends the keys to your
