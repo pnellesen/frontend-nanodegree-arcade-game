@@ -5,12 +5,35 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <div class="headerDiv">
+    	<div class="headerLeft">
+    		<button class="newGame" id="newGame">Start/Reset</button>
+    		<div id="charSelect"><br>
+    		Choose character:<br>
+    		<form id="gameForm">
+    		<!-- 
+    		    		<select id="gameChar">
+    			<option value="char-boy.png" selected>Boy</option>
+    			<option value="char-cat-girl.png">Cat Girl</option>
+    			<option value="char-horn-girl.png">Blue Girl</option>
+    			<option value="char-pink-girl.png">Pink Girl</option>
+    			<option value="char-princess-girl.png">Princess</option>
+    		</select>
+    		 -->
+    		
+    		Boy <input type="radio" id="gameChar" name="gameChar" value="char-boy.png" checked><br>
+    		Cat Girl <input type="radio" id="gameChar" name="gameChar" value="char-cat-girl.png"><br>
+    		Blue Girl <input type="radio" id="gameChar" name="gameChar" value="char-horn-girl.png"><br>
+    		Pink Girl <input type="radio" id="gameChar" name="gameChar" value="char-pink-girl.png"><br>
+    		Princess <input type="radio" id="gameChar" name="gameChar" value="char-princess-girl.png">
+    		</form>
+    		</div>
+    		
+    	</div>
+    	<div id="canvasDiv" class="headerRight"></div>
+  	</div>
     <script src="js/resources.js"></script>
     <script src="js/app.js"></script>
     <script src="js/engine.js"></script>
-    
-    <div class="headerDiv"><div class="headerLeft"><button class="newGame" id="newGame">New Game</button></div><div class="headerRight"><button class="stop">Stop</button></div></div>
-    
-    
 </body>
 </html>

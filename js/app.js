@@ -64,7 +64,7 @@ var Player = function(x,y,xStep,yStep) {
 	this.base = CanvasItem;
 	this.base(x,y,'images/char-boy.png');
 	
-	this.xStep = xStep || 0;//Number of pixels to move per keystroke in both x and y directions. Might not be needed.
+	this.xStep = xStep || 0;//Number of pixels to move per keystroke in both x and y directions.
 	this.yStep = yStep || 0;
 	
 	// Set up timers to track total time per round and best time.
@@ -126,10 +126,11 @@ Player.prototype.handleInput = function(kc) {
  * a "GameClock" is a CanvasItem that can be implemented
  * to display a timer at any given x/y coordinate. * 
  -------------------------------------------- */
-var GameClock = function(x,y) {
+var GameClock = function(x,y,lbl) {
 	this.base = CanvasItem;
 	this.base(x,y);
 	this.startTime = new Date();
+	this.lbl = lbl || "";
 }
 GameClock.prototype.drawClock = function (ms) {// ms is number of milliseconds. Clock will display in 00:00 format
 	ctx.font = this.y + "px Arial";
@@ -168,7 +169,9 @@ function buildAll() {
 }
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
+
 document.addEventListener('keyup', function(e) {
+   
     var allowedKeys = {
         37: 'left',
         38: 'up',
@@ -184,8 +187,25 @@ window.onload = function () {
 	document.getElementById("newGame").addEventListener("click", function(e) {
 		console.log("New Game clicked");
 		reset();// game reset in engine.js
-	},false);	
+	},false);
+
 }
+
+// Add ability for user to change the player character sprite via radio button selection
+var changeChar = function() {
+	console.log("Character selected: " + this.value);
+	player.sprite="images/" + this.value;
+	this.blur();
+	player.render();
+}
+
+var radios = document.getElementsByName('gameChar');
+
+for(var i = radios.length; i--; ) {
+    radios[i].onclick = changeChar;
+}
+// End sprite change
+
 
 /*
 The following function adapted from an example found at
