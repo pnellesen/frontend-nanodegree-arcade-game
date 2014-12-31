@@ -26,7 +26,7 @@ var CanvasItem = function(x,y,sprite) {
 var Enemy = function(x,y) {
 	this.base = CanvasItem;
 	this.base(x,y,'images/enemy-bug.png');
-	this.velocity = Math.floor(Math.random()*(121)+100);// this found at http://stackoverflow.com/questions/4959975/generate-random-value-between-two-numbers-in-javascript 
+	this.velocity = Math.floor(Math.random()*(121)+100);// Randomize enemy speed. This method found at http://stackoverflow.com/questions/4959975/generate-random-value-between-two-numbers-in-javascript 
 }
 
 // Update the enemy's position, required method for game
@@ -49,14 +49,16 @@ Enemy.prototype.reset = function() {
 	this.y = this.yInit;
 	this.velocity = Math.floor(Math.random()*(121)+100);
 }
-// Draw the enemy on the screen, required method for game
-/* Moved render function into CanvasItem constructor
- * 
+
+/*
+* Draw the enemy on the screen, required method for game
+* NOTE: Moved render function into CanvasItem constructor
+ 
 Enemy.prototype.render = function() {
 	ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
-
 */
+
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
@@ -102,9 +104,6 @@ Player.prototype.update = function(x,y) {
 	this.timer = new Date();
 }
 Player.prototype.handleInput = function(kc) {
-	// The way I've written this, the player sprite moves on the image?
-	// 		A: sort of - the "main()" function in engine.js redraws the entire frame, using
-	//			the x/y values we've set here. 
 	switch (true) {
 		case (kc === 'up'):
 			if (this.y - this.yStep > 0) this.y -= this.yStep;//y = 0 is top
@@ -153,12 +152,12 @@ var player;
 var bestTime = 0;// this is time in milliseconds
 function buildAll() {
 	console.log("got to buildAll");
-	for (var i = 0;i < 4;i++) {// Ideally, we'd set the number of enemies in resources.js, possibly based on user input
+	for (var i = 0;i < 4;i++) {
 		var x = 0;
-		var y = (83 * i) + 50;// Magic numbers. Bleh. Need to find a way to make the 50 and 83 values "globally accessible".
+		var y = (83 * i) + 50;// 50 and 83 values the same as used in engine.js to position game blocks
 		allEnemies.push(new Enemy(x,y));
 	}
-	player = new Player(0,382,101,83);// I hate magic numbers - 101 is width of all blocks, 83 is defined in engine.js as the default y step size when adding the blocks.
+	player = new Player(0,382,101,83);// 101 is width of all blocks, 83 is defined in engine.js as the default y step size when adding the blocks.
 	
 	pClock = new GameClock(120,30);// Clock to display current player time
 	bstClock = new GameClock(340,30);// Clock to display best time
@@ -196,7 +195,7 @@ var changeChar = function() {
 	console.log("Character selected: " + this.value);
 	player.sprite="images/" + this.value;
 	this.blur();
-	player.render();
+	player.render();// redraw player sprite with new image
 }
 
 var radios = document.getElementsByName('gameChar');
