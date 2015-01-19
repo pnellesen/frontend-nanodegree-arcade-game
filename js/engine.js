@@ -61,7 +61,7 @@ var Engine = (function(global) {
          */
        if (global.animate) win.requestAnimationFrame(main);
     	
-    };
+    }
 
     /* This function does some initial setup that should only occur once,
      * particularly setting the lastTime variable that is required for the

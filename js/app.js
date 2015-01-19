@@ -27,7 +27,7 @@ var Enemy = function(x,y) {
 	this.base = CanvasItem;
 	this.base(x,y,'images/enemy-bug.png');
 	this.velocity = Math.floor(Math.random()*(121)+100);// Randomize enemy speed. This method found at http://stackoverflow.com/questions/4959975/generate-random-value-between-two-numbers-in-javascript 
-}
+};
 
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
@@ -43,12 +43,12 @@ Enemy.prototype.update = function(dt) {
 	if (checkCollision(player,this)) {
 		player.reset();
 	}
-}
+};
 Enemy.prototype.reset = function() {
 	this.x = this.xInit;
 	this.y = this.yInit;
 	this.velocity = Math.floor(Math.random()*(121)+100);
-}
+};
 
 /*
 * Draw the enemy on the screen, required method for game
@@ -74,7 +74,7 @@ var Player = function(x,y,xStep,yStep) {
 	this.timer = this.startTime;
 	this.totalTime = null;
 	console.log("Player start time: " + this.timer);
-}
+};
 
 Player.prototype.reset = function(checkTime) {//send player back to start, update best time if player has reached top, reset player timer
 	this.totalTime = this.timer - this.startTime;// time in milliseconds.
@@ -91,7 +91,7 @@ Player.prototype.reset = function(checkTime) {//send player back to start, updat
 		console.log("You win! Total time: " + formatTimeString(this.totalTime) + " - Best Time: " + formatTimeString(bestTime));	
 	}
 	
-}
+};
 Player.prototype.update = function(x,y) {
 	/* this is called every time main is called in engine.js.
 	 * simply update the timer to the new system time.
@@ -102,7 +102,7 @@ Player.prototype.update = function(x,y) {
 		this.reset(true);
 	}
 	this.timer = new Date();
-}
+};
 Player.prototype.handleInput = function(kc) {
 	switch (true) {
 		case (kc === 'up'):
@@ -119,7 +119,7 @@ Player.prototype.handleInput = function(kc) {
 			break;
 	}
 	
-}
+};
 
 /* -------------------------------------------
  * a "GameClock" is a CanvasItem that can be implemented
@@ -130,17 +130,17 @@ var GameClock = function(x,y,lbl) {
 	this.base(x,y);
 	this.startTime = new Date();
 	this.lbl = lbl || "";
-}
+};
 GameClock.prototype.drawClock = function (ms) {// ms is number of milliseconds. Clock will display in 00:00 format
 	ctx.font = this.y + "px Arial";
 	ctx.fillStyle = "#ffffff";
 	ctx.fillRect(this.x, 0, 80,this.y + 10);
 	ctx.fillStyle = "#000000";
 	ctx.fillText(formatTimeString(ms),this.x,this.y);
-}
+};
 GameClock.prototype.reset = function () {
 	this.startTime = new Date();
-}
+};
 // End GameClock
 
 
@@ -188,7 +188,7 @@ window.onload = function () {
 		reset();// game reset in engine.js
 	},false);
 
-}
+};
 
 // Add ability for user to change the player character sprite via radio button selection
 var changeChar = function() {
@@ -196,7 +196,7 @@ var changeChar = function() {
 	player.sprite="images/" + this.value;
 	this.blur();
 	player.render();// redraw player sprite with new image
-}
+};
 
 var radios = document.getElementsByName('gameChar');
 
